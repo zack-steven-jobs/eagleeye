@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:task="http://www.springframework.org/schema/task"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/task
+http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+    <!-- 引入属性文件 -->
+    <context:property-placeholder location="classpath:config.properties" />
+
+    <!-- 自动扫描(自动注入) -->
+    <context:component-scan base-package="com.cmsz.eagleeye" />
+    <!--spring mybatis 数据库连接配置 -->
+    <import resource="spring-MybatisConfig.xml" />
+
+    <!-- 采用注释的方式配置bean -->
+    <context:annotation-config />
+    <!-- 该 BeanPostProcessor 将自动起作用，对标注 @Autowired 的 Bean 进行自动注入 -->
+    <bean
+        class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+  
+    <!-- 初始数据 -->
+    <!-- <bean id="baseData" class="com.cmsz.eagleeye.util.CacheBaseData"
+        init-method="setBaseData"/> -->
+    
+    <!-- 导入系统公共的公共配置文件 -->
+    <!-- <import resource="spring-commonconfig.xml" /> -->
+    
+</beans>

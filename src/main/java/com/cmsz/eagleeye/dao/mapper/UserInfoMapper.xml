@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cmsz.eagleeye.dao.UserInfoDao">
+	<resultMap id="BaseResultMap" type="com.cmsz.eagleeye.model.UserInfoModel">
+		<id column="id" property="userId" jdbcType="INTEGER" />
+		<result column="account" property="account" jdbcType="VARCHAR" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, account, user_name
+	</sql>
+	<!-- 新增一条 -->
+	
+	  <insert id="insertUser" parameterType="com.cmsz.eagleeye.model.User"
+	  useGeneratedKeys="true" keyProperty="id">
+             insert into days_user(  
+         state,
+         nickname)
+         values 
+         (        
+         #{state},
+         #{nickname})
+      </insert>  
+          
+	<insert id="insert" parameterType="com.cmsz.eagleeye.model.UserInfoModel"
+		useGeneratedKeys="true" keyProperty="userId">
+		insert into user_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="account != null">
+				account,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="account != null">
+				#{account,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<!-- 删除一条或多条 -->
+	<delete id="deleteByPrimaryKey">
+		delete from user_info where
+		id IN
+		<foreach collection="list" open="(" close=")" item="userId"
+			separator="," index="index">
+			#{userId}
+		</foreach>
+	</delete>
+	<!-- 修改一条规则 -->
+	<update id="update" parameterType="com.cmsz.eagleeye.model.UserInfoModel">
+		update user_info
+		<set>
+			<if test="account != null">
+				account = #{account,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{userId,jdbcType=INTEGER}
+	</update>
+
+	<!-- 通过主键查询一条 -->
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from user_info
+		where id = #{userId,jdbcType=INTEGER}
+	</select>
+
+	<!--根据条件查询记录或全部记录 -->
+	<select id="selectByCondition" parameterType="com.cmsz.eagleeye.model.UserInfoModel"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from user_info
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="account!=null and account!=''">
+				and account like CONCAT('%',#{account},'%')
+			</if>
+			<if test="userName!=null and userName!=''">
+				and user_name like
+				CONCAT('%',#{userName},'%')
+			</if>
+		</trim>
+		ORDER BY account DESC
+		LIMIT ${goTopIndex} ,${pageSize}
+	</select>
+
+	<!-- 根据条件查询记录数 -->
+	<select id="selectCount" parameterType="com.cmsz.eagleeye.model.UserInfoModel"
+		resultType="java.lang.Integer">
+		select count(1) from user_info
+		<trim prefix="where" prefixOverrides="AND|OR">
+			<if test="account!=null and account!=''">
+				and account like CONCAT('%',#{account},'%')
+			</if>
+			<if test="userName!=null and userName!=''">
+				and user_name like
+				CONCAT('%',#{userName},'%')
+			</if>
+		</trim>
+	</select>
+
+	<!-- 验证是否重名 -->
+	<select id="checkIsExist" parameterType="java.lang.String"
+		resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM user_info
+		WHERE account =
+		#{account}
+	</select>
+
+</mapper>

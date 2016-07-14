@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:task="http://www.springframework.org/schema/task" xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/task
+http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+    <!-- 公共配置信息注入到公共配置实体类 -->
+    
+	<bean id="commConfig" class="com.cmsz.eagleeye.cache.CommConfig">
+	    <property name="collectURL" value="${collect.url}" />
+	    <property name="collectURLByUpay" value="${collect.upayUrl}" />
+	    <property name="collectBussTotalURL" value="${collect.totalUrl}"/>
+	    <property name="collectBussDetailURL" value="${collect.detailsUrl}"/>
+	    <property name="pbillProvinceCode" value="${pbill.ProvinceCode}" />
+        <property name="exportSize" value="${export.defaultSize}" />
+	</bean>
+	 
+</beans>

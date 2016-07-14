@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <!-- 配置运营系统的dbcp数据源 和c3p0数据库连接池 -->
+    <bean id="eagleeyeDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close">
+        <property name="driverClass" value="${eagleeye.jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${eagleeye.jdbc.url}" />
+        <property name="user" value="${eagleeye.jdbc.username}" />
+        <property name="password" value="${eagleeye.jdbc.password}" />
+        <!--连接池中保留的最小连接数。默认:3 -->
+        <property name="minPoolSize" value="${eagleeye.c3p0.minPoolSize}" />
+        <!--连接池中保留的最大连接数。默认: 15 -->
+        <property name="maxPoolSize" value="${eagleeye.c3p0.maxPoolSize}" />
+        <!--初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。默认: 3 -->
+        <property name="initialPoolSize" value="${eagleeye.c3p0.initialPoolSize}" />
+        <!--最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。默认: 0 -->
+        <property name="maxIdleTime" value="${eagleeye.c3p0.maxIdleTime}" />
+        <!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。默认: 3 -->
+        <property name="acquireIncrement" value="${eagleeye.c3p0.acquireIncrement}" />
+        <!--每隔几秒检查所有连接池中的空闲连接。默认: 0 -->
+        <property name="idleConnectionTestPeriod"
+            value="${eagleeye.c3p0.idleConnectionTestPeriod}" />
+        <!--从数据库获取新连接失败后重复尝试的次数。默认: 30 -->
+        <property name="acquireRetryAttempts" value="${eagleeye.c3p0.acquireRetryAttempts}" />
+        <!--两次连接中间隔时间，单位毫秒。默认: 1000 -->
+        <property name="acquireRetryDelay" value="${eagleeye.c3p0.acquireRetryDelay}" />
+        <!--c3p0是异步操作的，缓慢的JDBC操作通过帮助进程完成。扩展这些操作可以有效的提升性能通过多线程实现多个操作同时被执行。默认: 
+            3 -->
+        <property name="numHelperThreads" value="${eagleeye.c3p0.numHelperThreads}" />
+        <!--获取连接失败将会引起所有等待连接池来获取连接的线程抛出异常。但是数据源仍有效保留，并在下次调用getConnection()的时候继续尝试获取连接。 
+            如果设为true，那么在尝试获取连接失败后该数据源将申明已断开并永久关闭。默认: false -->
+        <property name="breakAfterAcquireFailure"
+            value="${eagleeye.c3p0.breakAfterAcquireFailure}" />
+        <!--设为true时，connection校验开启，因性能消耗大请谨慎使用。默认: false -->
+        <property name="testConnectionOnCheckout"
+            value="${eagleeye.c3p0.testConnectionOnCheckout}" />
+        <!--JDBC的标准参数，用以控制数据源内加载的PreparedStatements数量。但由于预缓存的statements属于单个connection而不是整个连接池。 
+            所以设置这个参数需要考虑到多方面的因素。如果maxStatements与maxStatementsPerConnection均为0，则缓存被关闭。默认: 
+            0 -->
+        <property name="maxStatements" value="${eagleeye.c3p0.maxStatements}" />
+        <!--maxStatementsPerConnection定义了连接池内单个连接所拥有的最大缓存statements数。Default: 
+            0 -->
+        <property name="maxStatementsPerConnection"
+            value="${eagleeye.c3p0.maxStatementsPerConnection}" />
+    </bean>
+
+        <!-- 配置多数据源 -->
+    <bean id="dataSource" class="com.cmsz.eagleeye.util.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="eagleeyeDataSource" value-ref="eagleeyeDataSource" />
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="eagleeyeDataSource" />
+    </bean>
+    
+
+    <!-- 配置mybitasSqlSessionFactoryBean -->
+    <bean id="eagleeyeSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:MybatisConf.xml"></property>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:com/cmsz/eagleeye/dao/mapper/*Mapper.xml
+                </value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置SqlSessionTemplate -->
+    <bean id="eagleeyeSqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate"
+        scope="prototype">
+        <constructor-arg name="sqlSessionFactory"
+            ref="eagleeyeSqlSessionFactory" />
+    </bean>
+
+    <!-- 自动扫描，注入×Mapper实现类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.cmsz.eagleeye" />
+    </bean>
+</beans>
